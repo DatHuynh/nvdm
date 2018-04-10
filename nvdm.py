@@ -94,7 +94,7 @@ def train(sess, model,
           test_url, 
           batch_size, 
           training_epochs=1000, 
-          alternate_epochs=10):
+          alternate_epochs=10,is_restore=False):
   """train nvdm model."""
   train_set, train_count = utils.data_set(train_url)
   test_set, test_count = utils.data_set(test_url)
@@ -104,6 +104,11 @@ def train(sess, model,
 
   dev_batches = utils.create_batches(len(dev_set), batch_size, shuffle=False)
   test_batches = utils.create_batches(len(test_set), batch_size, shuffle=False)
+  #save model
+  saver = tf.train.Saver()
+  
+  if is_restore:
+      saver.restore(sess, "./checkpoints/model.ckpt")
   
   for epoch in range(training_epochs):
     train_batches = utils.create_batches(len(train_set), batch_size, shuffle=True)
@@ -197,7 +202,13 @@ def train(sess, model,
       print('| Epoch test: {:d} |'.format(epoch+1), 
              '| Perplexity: {:.9f}'.format(print_ppx),
              '| Per doc ppx: {:.5f}'.format(print_ppx_perdoc),
-             '| KLD: {:.5}'.format(print_kld))   
+             '| KLD: {:.5}'.format(print_kld))
+      
+    #create a check point after 50 epochs
+    if epoch % 50 == 0:
+        save_path = saver.save(sess,'./checkpoints/model.ckpt')
+        print("Model saved in path: %s" % save_path)
+      
 
 def main(argv=None):
     if FLAGS.non_linearity == 'tanh':
