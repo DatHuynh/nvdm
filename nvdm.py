@@ -238,7 +238,7 @@ class flag:
         self.non_linearity='tanh'
 	  
 def main(argv=None):
-    print('1')
+    print('2')
     sess = tf.Session()
     train_url = os.path.join('data/20news', 'train.feat')
     test_url = os.path.join('data/20news', 'test.feat')
@@ -248,6 +248,7 @@ def main(argv=None):
     settings_n_sample = [1,5]
     settings = itertools.product(settings_n_sample,settings_n_hidden,settings_n_topics)
     for setting in settings:
+        tf.reset_default_graph()
         (n_sample,n_hidden,n_topics) = setting
         print('model params n_sample: {} n_hidden: {} n_topics: {}'.format(n_sample,n_hidden,n_topics))
         time_stamp = '{:%Y-%m-%d-%H-%M-%S}'.format(datetime.datetime.now())
@@ -294,7 +295,7 @@ def main(argv=None):
         
         init = tf.global_variables_initializer()
         sess.run(init)
-        train(sess, nvdm, train_url, test_url, FLAGS.batch_size,FLAGS,train_csv_filename,dev_csv_filename,test_csv_filename,training_epochs=1)
+        train(sess, nvdm, train_url, test_url, FLAGS.batch_size,FLAGS,train_csv_filename,dev_csv_filename,test_csv_filename,training_epochs=1,alternate_epochs=1)
 
 if __name__ == '__main__':
     tf.app.run()
