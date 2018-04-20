@@ -24,16 +24,7 @@ np.random.seed(0)
 tf.set_random_seed(0)
 
 flags = tf.app.flags
-flags.DEFINE_string('data_dir', 'data/20news', 'Data dir path.')
-flags.DEFINE_float('learning_rate', 5e-5, 'Learning rate.')
-flags.DEFINE_integer('batch_size', 64, 'Batch size.')
-flags.DEFINE_integer('n_hidden', 500, 'Size of each hidden layer.')
-flags.DEFINE_integer('n_topic', 50, 'Size of stochastic vector.')
-flags.DEFINE_integer('n_sample', 1, 'Number of samples.')
-flags.DEFINE_integer('vocab_size', 2000, 'Vocabulary size.')
-flags.DEFINE_boolean('test', False, 'Process test data.')
-flags.DEFINE_string('non_linearity', 'tanh', 'Non-linearity of the MLP.')
-FLAGS = flags.FLAGS
+
 
 class NVDM(object):
     """ Neural Variational Document Model -- BOW VAE.
@@ -237,7 +228,8 @@ def train(sess, model,
         save_path = saver.save(sess,'./checkpoints/model.ckpt')
         print("Model saved in path: %s" % save_path)
       
-
+settings = []
+	  
 def main(argv=None):
     if FLAGS.non_linearity == 'tanh':
       non_linearity = tf.nn.tanh
@@ -257,10 +249,20 @@ def main(argv=None):
     init = tf.global_variables_initializer()
     sess.run(init)
 
-    train_url = os.path.join(FLAGS.data_dir, 'train.feat')
-    test_url = os.path.join(FLAGS.data_dir, 'test.feat')
-
-    train(sess, nvdm, train_url, test_url, FLAGS.batch_size)
+	train_url = os.path.join(FLAGS.data_dir, 'train.feat')
+	test_url = os.path.join(FLAGS.data_dir, 'test.feat')
+	for setting in settings:
+		flags.DEFINE_string('data_dir', 'data/20news', 'Data dir path.')
+		flags.DEFINE_float('learning_rate', 5e-5, 'Learning rate.')
+		flags.DEFINE_integer('batch_size', 64, 'Batch size.')
+		flags.DEFINE_integer('n_hidden', 500, 'Size of each hidden layer.')
+		flags.DEFINE_integer('n_topic', 50, 'Size of stochastic vector.')
+		flags.DEFINE_integer('n_sample', 1, 'Number of samples.')
+		flags.DEFINE_integer('vocab_size', 2000, 'Vocabulary size.')
+		flags.DEFINE_boolean('test', False, 'Process test data.')
+		flags.DEFINE_string('non_linearity', 'tanh', 'Non-linearity of the MLP.')
+		FLAGS = flags.FLAGS
+		train(sess, nvdm, train_url, test_url, FLAGS.batch_size)
 
 if __name__ == '__main__':
     tf.app.run()
