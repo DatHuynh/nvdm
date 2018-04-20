@@ -251,9 +251,10 @@ def main(argv=None):
 	settings = itertools.product(settings_n_sample,settings_n_hidden,settings_n_topics)
 	for setting in settings:
 		(n_sample,n_hidden,n_topics) = setting
-		train_csv_filename = 'train_output_{}_{}_{}.csv'.format(n_sample,n_hidden,n_topics)
-		dev_csv_filename = 'dev_output_{}_{}_{}.csv'.format(n_sample,n_hidden,n_topics)
-		test_csv_filename = 'test_output_{}_{}_{}.csv'.format(n_sample,n_hidden,n_topics)
+		time_stamp = '{:%Y-%m-%d-%H-%M-%S}'.format(datetime.datetime.now())
+		train_csv_filename = 'train_output_{}_{}_{}_{}.csv'.format(n_sample,n_hidden,n_topics,time_stamp)
+		dev_csv_filename = 'dev_output_{}_{}_{}_{}.csv'.format(n_sample,n_hidden,n_topics,time_stamp)
+		test_csv_filename = 'test_output_{}_{}_{}_{}.csv'.format(n_sample,n_hidden,n_topics,time_stamp)
 
 		with open(train_csv_filename, 'w') as train_csv:
 			train_writer = csv.writer(train_csv, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
