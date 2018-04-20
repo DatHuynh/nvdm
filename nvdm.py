@@ -9,7 +9,7 @@ import utils as utils
 import csv
 import itertools
 import datetime
-
+import pdb
 train_csv_filename = ''
 dev_csv_filename = ''
 test_csv_filename = ''
@@ -18,7 +18,7 @@ FLAGS = None
 np.random.seed(0)
 tf.set_random_seed(0)
 
-flags = tf.app.flags
+
 
 
 class NVDM(object):
@@ -251,7 +251,7 @@ def main(argv=None):
         with open(test_csv_filename, 'w') as test_csv:
             test_writer = csv.writer(test_csv, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
             test_writer.writerow(['Test Epoch', 'Perplexity', 'Per doc ppx', 'KLD'])
-		
+        flags = tf.app.flags
 #        flags.DEFINE_string('data_dir', 'data/20news', 'Data dir path.')
         flags.DEFINE_float('learning_rate', 5e-5, 'Learning rate.')
         flags.DEFINE_integer('batch_size', 64, 'Batch size.')
@@ -262,7 +262,7 @@ def main(argv=None):
         flags.DEFINE_boolean('test', False, 'Process test data.')
         flags.DEFINE_string('non_linearity', 'tanh', 'Non-linearity of the MLP.')
         FLAGS = flags.FLAGS
-        
+        #pdb.set_trace()
         if FLAGS.non_linearity == 'tanh':
           non_linearity = tf.nn.tanh
         elif FLAGS.non_linearity == 'sigmoid':
@@ -280,7 +280,7 @@ def main(argv=None):
         
         init = tf.global_variables_initializer()
         sess.run(init)
-        train(sess, nvdm, train_url, test_url, FLAGS.batch_size)
+        train(sess, nvdm, train_url, test_url, FLAGS.batch_size,training_epochs=1)
 
 if __name__ == '__main__':
     tf.app.run()
