@@ -8,10 +8,12 @@ import os
 import utils as utils
 import csv
 import itertools
+import datetime
 
 train_csv_filename = ''
 dev_csv_filename = ''
 test_csv_filename = ''
+FLAGS = None
 
 np.random.seed(0)
 tf.set_random_seed(0)
@@ -224,62 +226,61 @@ def train(sess, model,
 
 	  
 def main(argv=None):
-    if FLAGS.non_linearity == 'tanh':
-      non_linearity = tf.nn.tanh
-    elif FLAGS.non_linearity == 'sigmoid':
-      non_linearity = tf.nn.sigmoid
-    else:
-      non_linearity = tf.nn.relu
-
-    nvdm = NVDM(vocab_size=FLAGS.vocab_size,
-                n_hidden=FLAGS.n_hidden,
-                n_topic=FLAGS.n_topic, 
-                n_sample=FLAGS.n_sample,
-                learning_rate=FLAGS.learning_rate, 
-                batch_size=FLAGS.batch_size,
-                non_linearity=non_linearity)
+    
     sess = tf.Session()
-    init = tf.global_variables_initializer()
-    sess.run(init)
-
-	train_url = os.path.join(FLAGS.data_dir, 'train.feat')
-	test_url = os.path.join(FLAGS.data_dir, 'test.feat')
+    train_url = os.path.join('data/20news', 'train.feat')
+    test_url = os.path.join('data/20news', 'test.feat')
 	
-	settings_n_topics = [50,100,200]
-	settings_n_hidden = [300,500]
-	settings_n_sample = [1,5]
-	settings = itertools.product(settings_n_sample,settings_n_hidden,settings_n_topics)
-	for setting in settings:
-		(n_sample,n_hidden,n_topics) = setting
-		time_stamp = '{:%Y-%m-%d-%H-%M-%S}'.format(datetime.datetime.now())
-		train_csv_filename = 'train_output_{}_{}_{}_{}.csv'.format(n_sample,n_hidden,n_topics,time_stamp)
-		dev_csv_filename = 'dev_output_{}_{}_{}_{}.csv'.format(n_sample,n_hidden,n_topics,time_stamp)
-		test_csv_filename = 'test_output_{}_{}_{}_{}.csv'.format(n_sample,n_hidden,n_topics,time_stamp)
+    settings_n_topics = [50,100,200]
+    settings_n_hidden = [300,500]
+    settings_n_sample = [1,5]
+    settings = itertools.product(settings_n_sample,settings_n_hidden,settings_n_topics)
+    for setting in settings:
+        (n_sample,n_hidden,n_topics) = setting
+        time_stamp = '{:%Y-%m-%d-%H-%M-%S}'.format(datetime.datetime.now())
+        train_csv_filename = 'train_output_{}_{}_{}_{}.csv'.format(n_sample,n_hidden,n_topics,time_stamp)
+        dev_csv_filename = 'dev_output_{}_{}_{}_{}.csv'.format(n_sample,n_hidden,n_topics,time_stamp)
+        test_csv_filename = 'test_output_{}_{}_{}_{}.csv'.format(n_sample,n_hidden,n_topics,time_stamp)
 
-		with open(train_csv_filename, 'w') as train_csv:
-			train_writer = csv.writer(train_csv, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-			train_writer.writerow(['Train Epoch', 'Encoder/Decoder', 'Num', 'Corpus ppx', 'Per doc ppx', 'KLD'])
-
-		with open(dev_csv_filename, 'w') as dev_csv:
-			dev_writer = csv.writer(dev_csv, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-			dev_writer.writerow(['Dev Epoch', 'Perplexity', 'Per doc ppx', 'KLD'])
-
-		with open(test_csv_filename, 'w') as test_csv:
-			test_writer = csv.writer(test_csv, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-			test_writer.writerow(['Test Epoch', 'Perplexity', 'Per doc ppx', 'KLD'])
+        with open(train_csv_filename, 'w') as train_csv:
+            train_writer = csv.writer(train_csv, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+            train_writer.writerow(['Train Epoch', 'Encoder/Decoder', 'Num', 'Corpus ppx', 'Per doc ppx', 'KLD'])
+        with open(dev_csv_filename, 'w') as dev_csv:
+            dev_writer = csv.writer(dev_csv, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+            dev_writer.writerow(['Dev Epoch', 'Perplexity', 'Per doc ppx', 'KLD'])
+        with open(test_csv_filename, 'w') as test_csv:
+            test_writer = csv.writer(test_csv, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+            test_writer.writerow(['Test Epoch', 'Perplexity', 'Per doc ppx', 'KLD'])
 		
-		
-		flags.DEFINE_string('data_dir', 'data/20news', 'Data dir path.')
-		flags.DEFINE_float('learning_rate', 5e-5, 'Learning rate.')
-		flags.DEFINE_integer('batch_size', 64, 'Batch size.')
-		flags.DEFINE_integer('n_hidden', n_hidden, 'Size of each hidden layer.')
-		flags.DEFINE_integer('n_topic', n_topics, 'Size of stochastic vector.')
-		flags.DEFINE_integer('n_sample', n_sample, 'Number of samples.')
-		flags.DEFINE_integer('vocab_size', 2000, 'Vocabulary size.')
-		flags.DEFINE_boolean('test', False, 'Process test data.')
-		flags.DEFINE_string('non_linearity', 'tanh', 'Non-linearity of the MLP.')
-		FLAGS = flags.FLAGS
-		train(sess, nvdm, train_url, test_url, FLAGS.batch_size)
+#        flags.DEFINE_string('data_dir', 'data/20news', 'Data dir path.')
+        flags.DEFINE_float('learning_rate', 5e-5, 'Learning rate.')
+        flags.DEFINE_integer('batch_size', 64, 'Batch size.')
+        flags.DEFINE_integer('n_hidden', n_hidden, 'Size of each hidden layer.')
+        flags.DEFINE_integer('n_topic', n_topics, 'Size of stochastic vector.')
+        flags.DEFINE_integer('n_sample', n_sample, 'Number of samples.')
+        flags.DEFINE_integer('vocab_size', 2000, 'Vocabulary size.')
+        flags.DEFINE_boolean('test', False, 'Process test data.')
+        flags.DEFINE_string('non_linearity', 'tanh', 'Non-linearity of the MLP.')
+        FLAGS = flags.FLAGS
+        
+        if FLAGS.non_linearity == 'tanh':
+          non_linearity = tf.nn.tanh
+        elif FLAGS.non_linearity == 'sigmoid':
+          non_linearity = tf.nn.sigmoid
+        else:
+          non_linearity = tf.nn.relu
+    
+        nvdm = NVDM(vocab_size=FLAGS.vocab_size,
+                    n_hidden=FLAGS.n_hidden,
+                    n_topic=FLAGS.n_topic, 
+                    n_sample=FLAGS.n_sample,
+                    learning_rate=FLAGS.learning_rate, 
+                    batch_size=FLAGS.batch_size,
+                    non_linearity=non_linearity)
+        
+        init = tf.global_variables_initializer()
+        sess.run(init)
+        train(sess, nvdm, train_url, test_url, FLAGS.batch_size)
 
 if __name__ == '__main__':
     tf.app.run()
