@@ -6,6 +6,19 @@ import tensorflow as tf
 import math
 import os
 import utils as utils
+import csv
+
+with open('train_output.csv', 'w') as train_csv:
+    train_writer = csv.writer(train_csv, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+    train_writer.writerow(['Train Epoch', 'Encoder/Decoder', 'Num', 'Corpus ppx', 'Per doc ppx', 'KLD'])
+
+with open('dev_output.csv', 'w') as dev_csv:
+    dev_writer = csv.writer(dev_csv, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+    dev_writer.writerow(['Dev Epoch', 'Perplexity', 'Per doc ppx', 'KLD'])
+
+with open('test_output.csv', 'w') as test_csv:
+    test_writer = csv.writer(test_csv, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+    test_writer.writerow(['Test Epoch', 'Perplexity', 'Per doc ppx', 'KLD'])
 
 np.random.seed(0)
 tf.set_random_seed(0)
@@ -145,6 +158,11 @@ def train(sess, model,
         print_ppx = np.exp(loss_sum / word_count)
         print_ppx_perdoc = np.exp(ppx_sum / doc_count)
         print_kld = kld_sum/len(train_batches)
+        
+        with open('train_output.csv', 'a') as train_csv:
+          train_writer = csv.writer(train_csv, delimiter= ',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+          train_writer.writerow([epoch+1, print_mode, i,  print_ppx, print_ppx_perdoc, print_kld])
+            
         print('| Epoch train: {:d} |'.format(epoch+1), 
                print_mode, '{:d}'.format(i),
                '| Corpus ppx: {:.5f}'.format(print_ppx),  # perplexity for all docs
@@ -172,6 +190,11 @@ def train(sess, model,
     print_ppx = np.exp(loss_sum / word_count)
     print_ppx_perdoc = np.exp(ppx_sum / doc_count)
     print_kld = kld_sum/len(dev_batches)
+    
+    with open('dev_output.csv', 'a') as dev_csv:
+      dev_writer = csv.writer(dev_csv, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+      dev_writer.writerow([epoch+1, print_ppx, print_ppx_perdoc, print_kld])
+        
     print('| Epoch dev: {:d} |'.format(epoch+1), 
            '| Perplexity: {:.9f}'.format(print_ppx),
            '| Per doc ppx: {:.5f}'.format(print_ppx_perdoc),
@@ -199,6 +222,11 @@ def train(sess, model,
       print_ppx = np.exp(loss_sum / word_count)
       print_ppx_perdoc = np.exp(ppx_sum / doc_count)
       print_kld = kld_sum/len(test_batches)
+    
+      with open('test_output.csv', 'a') as test_csv:
+        test_writer = csv.writer(test_csv, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+        test_writer.writerow([epoch+1, print_ppx, print_ppx_perdoc, print_kld])
+        
       print('| Epoch test: {:d} |'.format(epoch+1), 
              '| Perplexity: {:.9f}'.format(print_ppx),
              '| Per doc ppx: {:.5f}'.format(print_ppx_perdoc),
