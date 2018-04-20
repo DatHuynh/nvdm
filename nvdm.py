@@ -13,7 +13,6 @@ import pdb
 train_csv_filename = ''
 dev_csv_filename = ''
 test_csv_filename = ''
-FLAGS = None
 
 np.random.seed(0)
 tf.set_random_seed(0)
@@ -227,10 +226,19 @@ def train(sess, model,
         save_path = saver.save(sess,'./checkpoints/model.ckpt')
         print("Model saved in path: %s" % save_path)
       
-
+class flag:
+    def __init__(self,n_sample,n_hidden,n_topics):
+        self.learning_rate=5e-5
+        self.batch_size=64
+        self.n_hidden=n_hidden
+        self.n_topic= n_topics
+        self.n_sample=n_sample
+        self.vocab_size= 2000
+        self.test=False
+        self.non_linearity='tanh'
 	  
 def main(argv=None):
-    print('0')
+    print('1')
     sess = tf.Session()
     train_url = os.path.join('data/20news', 'train.feat')
     test_url = os.path.join('data/20news', 'test.feat')
@@ -241,6 +249,7 @@ def main(argv=None):
     settings = itertools.product(settings_n_sample,settings_n_hidden,settings_n_topics)
     for setting in settings:
         (n_sample,n_hidden,n_topics) = setting
+        print('model params n_sample: {} n_hidden: {} n_topics: {}'.format(n_sample,n_hidden,n_topics))
         time_stamp = '{:%Y-%m-%d-%H-%M-%S}'.format(datetime.datetime.now())
         train_csv_filename = './log/train_output_{}_{}_{}_{}.csv'.format(n_sample,n_hidden,n_topics,time_stamp)
         dev_csv_filename = './log/dev_output_{}_{}_{}_{}.csv'.format(n_sample,n_hidden,n_topics,time_stamp)
@@ -255,17 +264,18 @@ def main(argv=None):
         with open(test_csv_filename, 'w') as test_csv:
             test_writer = csv.writer(test_csv, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
             test_writer.writerow(['Test Epoch', 'Perplexity', 'Per doc ppx', 'KLD'])
-        flags = tf.app.flags
+#        flags = tf.app.flags
 #        flags.DEFINE_string('data_dir', 'data/20news', 'Data dir path.')
-        flags.DEFINE_float('learning_rate', 5e-5, 'Learning rate.')
-        flags.DEFINE_integer('batch_size', 64, 'Batch size.')
-        flags.DEFINE_integer('n_hidden', n_hidden, 'Size of each hidden layer.')
-        flags.DEFINE_integer('n_topic', n_topics, 'Size of stochastic vector.')
-        flags.DEFINE_integer('n_sample', n_sample, 'Number of samples.')
-        flags.DEFINE_integer('vocab_size', 2000, 'Vocabulary size.')
-        flags.DEFINE_boolean('test', False, 'Process test data.')
-        flags.DEFINE_string('non_linearity', 'tanh', 'Non-linearity of the MLP.')
-        FLAGS = flags.FLAGS
+#        flags.DEFINE_float('learning_rate', 5e-5, 'Learning rate.')
+#        flags.DEFINE_integer('batch_size', 64, 'Batch size.')
+#        flags.DEFINE_integer('n_hidden', n_hidden, 'Size of each hidden layer.')
+#        flags.DEFINE_integer('n_topic', n_topics, 'Size of stochastic vector.')
+#        flags.DEFINE_integer('n_sample', n_sample, 'Number of samples.')
+#        flags.DEFINE_integer('vocab_size', 2000, 'Vocabulary size.')
+#        flags.DEFINE_boolean('test', False, 'Process test data.')
+#        flags.DEFINE_string('non_linearity', 'tanh', 'Non-linearity of the MLP.')
+#        FLAGS = flags.FLAGS
+        FLAGS = flag(n_sample,n_hidden,n_topics)
         #pdb.set_trace()
         if FLAGS.non_linearity == 'tanh':
           non_linearity = tf.nn.tanh
