@@ -91,7 +91,11 @@ class NVDM(object):
 def train(sess, model, 
           train_url, 
           test_url, 
-          batch_size, 
+          batch_size,
+          FLAGS,
+          train_csv_filename,
+          dev_csv_filename,
+          test_csv_filename, 
           training_epochs=1000, 
           alternate_epochs=10,is_restore=False):
   """train nvdm model."""
@@ -226,7 +230,7 @@ def train(sess, model,
 
 	  
 def main(argv=None):
-    
+    print('0')
     sess = tf.Session()
     train_url = os.path.join('data/20news', 'train.feat')
     test_url = os.path.join('data/20news', 'test.feat')
@@ -238,9 +242,9 @@ def main(argv=None):
     for setting in settings:
         (n_sample,n_hidden,n_topics) = setting
         time_stamp = '{:%Y-%m-%d-%H-%M-%S}'.format(datetime.datetime.now())
-        train_csv_filename = 'train_output_{}_{}_{}_{}.csv'.format(n_sample,n_hidden,n_topics,time_stamp)
-        dev_csv_filename = 'dev_output_{}_{}_{}_{}.csv'.format(n_sample,n_hidden,n_topics,time_stamp)
-        test_csv_filename = 'test_output_{}_{}_{}_{}.csv'.format(n_sample,n_hidden,n_topics,time_stamp)
+        train_csv_filename = './log/train_output_{}_{}_{}_{}.csv'.format(n_sample,n_hidden,n_topics,time_stamp)
+        dev_csv_filename = './log/dev_output_{}_{}_{}_{}.csv'.format(n_sample,n_hidden,n_topics,time_stamp)
+        test_csv_filename = './log/test_output_{}_{}_{}_{}.csv'.format(n_sample,n_hidden,n_topics,time_stamp)
 
         with open(train_csv_filename, 'w') as train_csv:
             train_writer = csv.writer(train_csv, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
@@ -280,7 +284,7 @@ def main(argv=None):
         
         init = tf.global_variables_initializer()
         sess.run(init)
-        train(sess, nvdm, train_url, test_url, FLAGS.batch_size,training_epochs=1)
+        train(sess, nvdm, train_url, test_url, FLAGS.batch_size,FLAGS,train_csv_filename,dev_csv_filename,test_csv_filename,training_epochs=1)
 
 if __name__ == '__main__':
     tf.app.run()
