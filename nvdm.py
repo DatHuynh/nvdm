@@ -7,6 +7,7 @@ import math
 import os
 import utils as utils
 import csv
+import itertools
 
 with open('train_output.csv', 'w') as train_csv:
     train_writer = csv.writer(train_csv, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
@@ -228,7 +229,7 @@ def train(sess, model,
         save_path = saver.save(sess,'./checkpoints/model.ckpt')
         print("Model saved in path: %s" % save_path)
       
-settings = []
+
 	  
 def main(argv=None):
     if FLAGS.non_linearity == 'tanh':
@@ -251,13 +252,19 @@ def main(argv=None):
 
 	train_url = os.path.join(FLAGS.data_dir, 'train.feat')
 	test_url = os.path.join(FLAGS.data_dir, 'test.feat')
+	
+	settings_n_topics = [50,100,200]
+	settings_n_hidden = [300,500]
+	settings_n_sample = [1,5]
+	settings = itertools.product(settings_n_sample,settings_n_hidden,settings_n_topics)
 	for setting in settings:
+		(n_sample,n_hidden,n_topics) = setting
 		flags.DEFINE_string('data_dir', 'data/20news', 'Data dir path.')
 		flags.DEFINE_float('learning_rate', 5e-5, 'Learning rate.')
 		flags.DEFINE_integer('batch_size', 64, 'Batch size.')
-		flags.DEFINE_integer('n_hidden', 500, 'Size of each hidden layer.')
-		flags.DEFINE_integer('n_topic', 50, 'Size of stochastic vector.')
-		flags.DEFINE_integer('n_sample', 1, 'Number of samples.')
+		flags.DEFINE_integer('n_hidden', n_hidden, 'Size of each hidden layer.')
+		flags.DEFINE_integer('n_topic', n_topics, 'Size of stochastic vector.')
+		flags.DEFINE_integer('n_sample', n_sample, 'Number of samples.')
 		flags.DEFINE_integer('vocab_size', 2000, 'Vocabulary size.')
 		flags.DEFINE_boolean('test', False, 'Process test data.')
 		flags.DEFINE_string('non_linearity', 'tanh', 'Non-linearity of the MLP.')
