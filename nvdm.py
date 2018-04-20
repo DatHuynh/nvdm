@@ -9,21 +9,9 @@ import utils as utils
 import csv
 import itertools
 
-train_csv_filename = 'train_output.csv'
-dev_csv_filename = 'dev_output.csv'
-test_csv_filename = 'test_output.csv'
-
-with open(train_csv_filename, 'w') as train_csv:
-    train_writer = csv.writer(train_csv, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-    train_writer.writerow(['Train Epoch', 'Encoder/Decoder', 'Num', 'Corpus ppx', 'Per doc ppx', 'KLD'])
-
-with open(dev_csv_filename, 'w') as dev_csv:
-    dev_writer = csv.writer(dev_csv, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-    dev_writer.writerow(['Dev Epoch', 'Perplexity', 'Per doc ppx', 'KLD'])
-
-with open(test_csv_filename, 'w') as test_csv:
-    test_writer = csv.writer(test_csv, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-    test_writer.writerow(['Test Epoch', 'Perplexity', 'Per doc ppx', 'KLD'])
+train_csv_filename = ''
+dev_csv_filename = ''
+test_csv_filename = ''
 
 np.random.seed(0)
 tf.set_random_seed(0)
@@ -263,6 +251,23 @@ def main(argv=None):
 	settings = itertools.product(settings_n_sample,settings_n_hidden,settings_n_topics)
 	for setting in settings:
 		(n_sample,n_hidden,n_topics) = setting
+		train_csv_filename = 'train_output_{}_{}_{}.csv'.format(n_sample,n_hidden,n_topics)
+		dev_csv_filename = 'dev_output_{}_{}_{}.csv'.format(n_sample,n_hidden,n_topics)
+		test_csv_filename = 'test_output_{}_{}_{}.csv'.format(n_sample,n_hidden,n_topics)
+
+		with open(train_csv_filename, 'w') as train_csv:
+			train_writer = csv.writer(train_csv, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+			train_writer.writerow(['Train Epoch', 'Encoder/Decoder', 'Num', 'Corpus ppx', 'Per doc ppx', 'KLD'])
+
+		with open(dev_csv_filename, 'w') as dev_csv:
+			dev_writer = csv.writer(dev_csv, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+			dev_writer.writerow(['Dev Epoch', 'Perplexity', 'Per doc ppx', 'KLD'])
+
+		with open(test_csv_filename, 'w') as test_csv:
+			test_writer = csv.writer(test_csv, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+			test_writer.writerow(['Test Epoch', 'Perplexity', 'Per doc ppx', 'KLD'])
+		
+		
 		flags.DEFINE_string('data_dir', 'data/20news', 'Data dir path.')
 		flags.DEFINE_float('learning_rate', 5e-5, 'Learning rate.')
 		flags.DEFINE_integer('batch_size', 64, 'Batch size.')
