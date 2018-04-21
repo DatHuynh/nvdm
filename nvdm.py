@@ -301,18 +301,16 @@ def main(argv=None):
         
         init = tf.global_variables_initializer()
         sess.run(init)
-        train(sess, nvdm, train_url, test_url, FLAGS.batch_size,FLAGS,train_csv_filename,dev_csv_filename,test_csv_filename,training_epochs=1,alternate_epochs=1)
+        train(sess, nvdm, train_url, test_url, FLAGS.batch_size,FLAGS,train_csv_filename,dev_csv_filename,test_csv_filename)
         sess.close()
         tf.reset_default_graph()
+	
 	# stop timer and write to file
         elapsed_time = time.time() - start_time
 
         with open(time_log_filename, 'w') as time_log:
-          time_log.write("Time Stamp\n")
-          time_log.write(str(time_stamp) + "\n\n")
-          time_log.write("Time Elapsed\n")
-          time_log.write(str(elapsed_time))
-
+          time_log.write("Time Stamp: " + str(time_stamp) + "\n\n" + "Time Elapsed: " + str(elapsed_time))
+	
         time_log.close()
 		
 if __name__ == '__main__':
