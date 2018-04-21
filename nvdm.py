@@ -63,7 +63,7 @@ class NVDM(object):
           # multiple samples
           else:
             eps = tf.random_normal((self.n_sample*batch_size, self.n_topic), 0, 1)
-            eps_list = tf.split(0, self.n_sample, eps)
+            eps_list = tf.split(0, tf.cast(self.n_sample,tf.int32), eps)
             recons_loss_list = []
             for i in xrange(self.n_sample):
               if i > 0: tf.get_variable_scope().reuse_variables()
@@ -238,7 +238,7 @@ class flag:
         self.non_linearity='tanh'
 	  
 def main(argv=None):
-    print('3')
+    print('4')
     
     train_url = os.path.join('data/20news', 'train.feat')
     test_url = os.path.join('data/20news', 'test.feat')
@@ -297,5 +297,6 @@ def main(argv=None):
         sess.run(init)
         train(sess, nvdm, train_url, test_url, FLAGS.batch_size,FLAGS,train_csv_filename,dev_csv_filename,test_csv_filename,training_epochs=1,alternate_epochs=1)
         sess.close()
+        tf.reset_default_graph()
 if __name__ == '__main__':
     tf.app.run()
