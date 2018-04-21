@@ -65,8 +65,7 @@ class NVDM(object):
           # multiple samples
           else:
             eps = tf.random_normal((self.n_sample*batch_size, self.n_topic), 0, 1)
-            #eps_list = tf.split(0, tf.cast(self.n_sample,tf.int32), eps)
-	    eps_list = tf.split(eps, tf.cast(self.n_sample,tf.int32), 0)
+	    eps_list = tf.split(eps, self.n_sample, 0)
             recons_loss_list = []
             for i in xrange(self.n_sample):
               if i > 0: tf.get_variable_scope().reuse_variables()
