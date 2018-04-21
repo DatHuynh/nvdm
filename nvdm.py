@@ -10,6 +10,8 @@ import csv
 import itertools
 import datetime
 import pdb
+import time
+
 train_csv_filename = ''
 dev_csv_filename = ''
 test_csv_filename = ''
@@ -249,12 +251,16 @@ def main(argv=None):
     settings = itertools.product(settings_n_sample,settings_n_hidden,settings_n_topics)
     for setting in settings:
         
+	# start timer
+        start_time = time.time()
+	
         (n_sample,n_hidden,n_topics) = setting
         print('model params n_sample: {} n_hidden: {} n_topics: {}'.format(n_sample,n_hidden,n_topics))
         time_stamp = '{:%Y-%m-%d-%H-%M-%S}'.format(datetime.datetime.now())
         train_csv_filename = './log/train_output_{}_{}_{}_{}.csv'.format(n_sample,n_hidden,n_topics,time_stamp)
         dev_csv_filename = './log/dev_output_{}_{}_{}_{}.csv'.format(n_sample,n_hidden,n_topics,time_stamp)
         test_csv_filename = './log/test_output_{}_{}_{}_{}.csv'.format(n_sample,n_hidden,n_topics,time_stamp)
+	time_log_filename = './log/time_elapsed_{}_{}_{}.txt'.format(n_sample,n_hidden,n_topics)
 
         with open(train_csv_filename, 'w') as train_csv:
             train_writer = csv.writer(train_csv, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
@@ -298,5 +304,16 @@ def main(argv=None):
         train(sess, nvdm, train_url, test_url, FLAGS.batch_size,FLAGS,train_csv_filename,dev_csv_filename,test_csv_filename,training_epochs=1,alternate_epochs=1)
         sess.close()
         tf.reset_default_graph()
+	# stop timer and write to file
+        elapsed_time = time.time() - start_time
+
+        with open(time_log_filename, 'w') as time_log:
+          time_log.write("Time Stamp\n")
+          time_log.write(str(time_stamp) + "\n\n")
+          time_log.write("Time Elapsed\n")
+          time_log.write(str(elapsed_time))
+
+        time_log.close()
+		
 if __name__ == '__main__':
     tf.app.run()
