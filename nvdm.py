@@ -11,7 +11,7 @@ import itertools
 import datetime
 import pdb
 import time
-import sys
+
 train_csv_filename = ''
 dev_csv_filename = ''
 test_csv_filename = ''
@@ -65,7 +65,7 @@ class NVDM(object):
           # multiple samples
           else:
             eps = tf.random_normal((self.n_sample*batch_size, self.n_topic), 0, 1)
-	    eps_list = tf.split(eps, self.n_sample, 0)
+            eps_list = tf.split(eps, self.n_sample, 0)
             recons_loss_list = []
             for i in xrange(self.n_sample):
               if i > 0: tf.get_variable_scope().reuse_variables()
@@ -248,10 +248,8 @@ def main(argv=None):
     settings_n_topics = [50,100,200]
     settings_n_hidden = [300,500]
     settings_n_sample = [1,5]
-    settings = list(itertools.product(settings_n_hidden,settings_n_topics,settings_n_sample))
-    configure_setting = int(sys.argv[1])
-    print('configure setting: {}'.format(configure_setting))
-    for setting in settings[configure_setting*2:(configure_setting+1)*2]:
+    settings = itertools.product(settings_n_sample,settings_n_hidden,settings_n_topics)
+    for setting in settings:
         
 	# start timer
         start_time = time.time()
@@ -262,7 +260,7 @@ def main(argv=None):
         train_csv_filename = './log/train_output_{}_{}_{}_{}.csv'.format(n_sample,n_hidden,n_topics,time_stamp)
         dev_csv_filename = './log/dev_output_{}_{}_{}_{}.csv'.format(n_sample,n_hidden,n_topics,time_stamp)
         test_csv_filename = './log/test_output_{}_{}_{}_{}.csv'.format(n_sample,n_hidden,n_topics,time_stamp)
-	time_log_filename = './log/time_elapsed_{}_{}_{}.txt'.format(n_sample,n_hidden,n_topics)
+        time_log_filename = './log/time_elapsed_{}_{}_{}.txt'.format(n_sample,n_hidden,n_topics)
 
         with open(train_csv_filename, 'w') as train_csv:
             train_writer = csv.writer(train_csv, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
