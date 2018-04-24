@@ -11,6 +11,7 @@ import itertools
 import datetime
 import pdb
 import time
+import sys
 
 train_csv_filename = ''
 dev_csv_filename = ''
@@ -245,16 +246,19 @@ def main(argv=None):
     train_url = os.path.join('data/20news', 'train.feat')
     test_url = os.path.join('data/20news', 'test.feat')
 	
-    settings_n_topics = [50,100,200]
-    settings_n_hidden = [300,500]
-    settings_n_sample = [1,5]
-    settings = itertools.product(settings_n_sample,settings_n_hidden,settings_n_topics)
-    for setting in settings:
+#    settings_n_topics = [50,100,200]
+#    settings_n_hidden = [300,500]
+#    settings_n_sample = [1,5]
+#    settings = itertools.product(settings_n_sample,settings_n_hidden,settings_n_topics)
+    
+    n_hidden = int(sys.argv[1])
+    n_topics = int(sys.argv[2])
+    for n_sample in [1,5]:
         
 	# start timer
         start_time = time.time()
 	
-        (n_sample,n_hidden,n_topics) = setting
+        #(n_sample,n_hidden,n_topics) = setting
         print('model params n_sample: {} n_hidden: {} n_topics: {}'.format(n_sample,n_hidden,n_topics))
         time_stamp = '{:%Y-%m-%d-%H-%M-%S}'.format(datetime.datetime.now())
         train_csv_filename = './log/train_output_{}_{}_{}_{}.csv'.format(n_sample,n_hidden,n_topics,time_stamp)
