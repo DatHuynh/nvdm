@@ -225,9 +225,9 @@ def train(sess, model,
              '| KLD: {:.5}'.format(print_kld))
       
     #create a check point after 50 epochs
-    if epoch % 50 == 0:
-        save_path = saver.save(sess,'./checkpoints/model.ckpt')
-        print("Model saved in path: %s" % save_path)
+#    if epoch % 50 == 0:
+#        save_path = saver.save(sess,'./checkpoints/model.ckpt')
+#        print("Model saved in path: %s" % save_path)
       
 class flag:
     def __init__(self,n_sample,n_hidden,n_topics):
