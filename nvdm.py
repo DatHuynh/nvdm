@@ -249,7 +249,7 @@ def main(argv=None):
     settings_n_topics = [50,100,200]
     settings_n_hidden = [300,500]
     settings_n_sample = [1,5]
-    settings = itertools.product(settings_n_hidden,settings_n_topics,settings_n_sample)
+    settings = list(itertools.product(settings_n_hidden,settings_n_topics,settings_n_sample))
     configure_setting = int(sys.argv[1])
     print('configure setting: {}'.format(configure_setting))
     for setting in settings[configure_setting*2:(configure_setting+1)*2]:
