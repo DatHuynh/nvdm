@@ -11,6 +11,7 @@ import itertools
 import datetime
 import pdb
 import time
+import sys
 
 train_csv_filename = ''
 dev_csv_filename = ''
@@ -65,7 +66,7 @@ class NVDM(object):
           # multiple samples
           else:
             eps = tf.random_normal((self.n_sample*batch_size, self.n_topic), 0, 1)
-	    eps_list = tf.split(eps, self.n_sample, 0)
+            eps_list = tf.split(eps, self.n_sample, 0)
             recons_loss_list = []
             for i in xrange(self.n_sample):
               if i > 0: tf.get_variable_scope().reuse_variables()
@@ -154,11 +155,11 @@ def train(sess, model,
           train_writer = csv.writer(train_csv, delimiter= ',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
           train_writer.writerow([epoch+1, print_mode, i,  print_ppx, print_ppx_perdoc, print_kld])
             
-        print('| Epoch train: {:d} |'.format(epoch+1), 
-               print_mode, '{:d}'.format(i),
-               '| Corpus ppx: {:.5f}'.format(print_ppx),  # perplexity for all docs
-               '| Per doc ppx: {:.5f}'.format(print_ppx_perdoc),  # perplexity for per doc
-               '| KLD: {:.5}'.format(print_kld))
+#        print('| Epoch train: {:d} |'.format(epoch+1), 
+#               print_mode, '{:d}'.format(i),
+#               '| Corpus ppx: {:.5f}'.format(print_ppx),  # perplexity for all docs
+#               '| Per doc ppx: {:.5f}'.format(print_ppx_perdoc),  # perplexity for per doc
+#               '| KLD: {:.5}'.format(print_kld))
     #-------------------------------
     # dev
     loss_sum = 0.0
@@ -186,10 +187,10 @@ def train(sess, model,
       dev_writer = csv.writer(dev_csv, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
       dev_writer.writerow([epoch+1, print_ppx, print_ppx_perdoc, print_kld])
         
-    print('| Epoch dev: {:d} |'.format(epoch+1), 
-           '| Perplexity: {:.9f}'.format(print_ppx),
-           '| Per doc ppx: {:.5f}'.format(print_ppx_perdoc),
-           '| KLD: {:.5}'.format(print_kld))        
+#    print('| Epoch dev: {:d} |'.format(epoch+1), 
+#           '| Perplexity: {:.9f}'.format(print_ppx),
+#           '| Per doc ppx: {:.5f}'.format(print_ppx_perdoc),
+#           '| KLD: {:.5}'.format(print_kld))        
     #-------------------------------
     # test
     if FLAGS.test:
@@ -218,15 +219,15 @@ def train(sess, model,
         test_writer = csv.writer(test_csv, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
         test_writer.writerow([epoch+1, print_ppx, print_ppx_perdoc, print_kld])
         
-      print('| Epoch test: {:d} |'.format(epoch+1), 
-             '| Perplexity: {:.9f}'.format(print_ppx),
-             '| Per doc ppx: {:.5f}'.format(print_ppx_perdoc),
-             '| KLD: {:.5}'.format(print_kld))
+#      print('| Epoch test: {:d} |'.format(epoch+1), 
+#             '| Perplexity: {:.9f}'.format(print_ppx),
+#             '| Per doc ppx: {:.5f}'.format(print_ppx_perdoc),
+#             '| KLD: {:.5}'.format(print_kld))
       
     #create a check point after 50 epochs
-    if epoch % 50 == 0:
-        save_path = saver.save(sess,'./checkpoints/model.ckpt')
-        print("Model saved in path: %s" % save_path)
+    #if epoch % 50 == 0:
+  save_path = saver.save(sess,'./checkpoints/model_{}_{}_{}.ckpt'.format(FLAGS.n_sample,FLAGS.n_hidden,FLAGS.n_topics))
+  print("Model saved in path: %s" % save_path)
       
 class flag:
     def __init__(self,n_sample,n_hidden,n_topics):
@@ -236,11 +237,11 @@ class flag:
         self.n_topic= n_topics
         self.n_sample=n_sample
         self.vocab_size= 2000
-        self.test=False
+        self.test=True
         self.non_linearity='tanh'
 	  
 def main(argv=None):
-    print('4')
+    print('Version 4')
     
     train_url = os.path.join('data/20news', 'train.feat')
     test_url = os.path.join('data/20news', 'test.feat')
@@ -248,10 +249,13 @@ def main(argv=None):
     settings_n_topics = [50,100,200]
     settings_n_hidden = [300,500]
     settings_n_sample = [1,5]
-    settings = itertools.product(settings_n_sample,settings_n_hidden,settings_n_topics)
-    for setting in settings:
-        
-	# start timer
+    settings = itertools.product(settings_n_hidden,settings_n_topics,settings_n_sample)
+    configure_setting = int(sys.argv[0])
+    print('configure setting: {}'.format(configure_setting))
+    for setting in settings[configure_setting*2:(configure_setting+1)*2]:
+        # start timer
+        print('-'*30)
+        print(setting)
         start_time = time.time()
 	
         (n_sample,n_hidden,n_topics) = setting
@@ -260,7 +264,7 @@ def main(argv=None):
         train_csv_filename = './log/train_output_{}_{}_{}_{}.csv'.format(n_sample,n_hidden,n_topics,time_stamp)
         dev_csv_filename = './log/dev_output_{}_{}_{}_{}.csv'.format(n_sample,n_hidden,n_topics,time_stamp)
         test_csv_filename = './log/test_output_{}_{}_{}_{}.csv'.format(n_sample,n_hidden,n_topics,time_stamp)
-	time_log_filename = './log/time_elapsed_{}_{}_{}.txt'.format(n_sample,n_hidden,n_topics)
+        time_log_filename = './log/time_elapsed_{}_{}_{}.txt'.format(n_sample,n_hidden,n_topics)
 
         with open(train_csv_filename, 'w') as train_csv:
             train_writer = csv.writer(train_csv, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
@@ -271,17 +275,7 @@ def main(argv=None):
         with open(test_csv_filename, 'w') as test_csv:
             test_writer = csv.writer(test_csv, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
             test_writer.writerow(['Test Epoch', 'Perplexity', 'Per doc ppx', 'KLD'])
-#        flags = tf.app.flags
-#        flags.DEFINE_string('data_dir', 'data/20news', 'Data dir path.')
-#        flags.DEFINE_float('learning_rate', 5e-5, 'Learning rate.')
-#        flags.DEFINE_integer('batch_size', 64, 'Batch size.')
-#        flags.DEFINE_integer('n_hidden', n_hidden, 'Size of each hidden layer.')
-#        flags.DEFINE_integer('n_topic', n_topics, 'Size of stochastic vector.')
-#        flags.DEFINE_integer('n_sample', n_sample, 'Number of samples.')
-#        flags.DEFINE_integer('vocab_size', 2000, 'Vocabulary size.')
-#        flags.DEFINE_boolean('test', False, 'Process test data.')
-#        flags.DEFINE_string('non_linearity', 'tanh', 'Non-linearity of the MLP.')
-#        FLAGS = flags.FLAGS
+
         FLAGS = flag(n_sample,n_hidden,n_topics)
         #pdb.set_trace()
         if FLAGS.non_linearity == 'tanh':
@@ -291,6 +285,7 @@ def main(argv=None):
         else:
           non_linearity = tf.nn.relu
         sess = tf.Session()
+        #with tf.device('/device:GPU:0'):
         nvdm = NVDM(vocab_size=FLAGS.vocab_size,
                     n_hidden=FLAGS.n_hidden,
                     n_topic=FLAGS.n_topic, 
@@ -298,10 +293,10 @@ def main(argv=None):
                     learning_rate=FLAGS.learning_rate, 
                     batch_size=FLAGS.batch_size,
                     non_linearity=non_linearity)
-        
+           
         init = tf.global_variables_initializer()
         sess.run(init)
-        train(sess, nvdm, train_url, test_url, FLAGS.batch_size,FLAGS,train_csv_filename,dev_csv_filename,test_csv_filename)
+        train(sess, nvdm, train_url, test_url, FLAGS.batch_size,FLAGS,train_csv_filename,dev_csv_filename,test_csv_filename,training_epochs=1)
         sess.close()
         tf.reset_default_graph()
 	
@@ -309,7 +304,7 @@ def main(argv=None):
         elapsed_time = time.time() - start_time
 
         with open(time_log_filename, 'w') as time_log:
-          time_log.write("Time Stamp: " + str(time_stamp) + "\n\n" + "Time Elapsed: " + str(elapsed_time))
+          time_log.write("Time Stamp: " + str(time_stamp) + "\n" + "Time Elapsed: " + str(elapsed_time))
 	
         time_log.close()
 		
