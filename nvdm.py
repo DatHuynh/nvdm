@@ -99,7 +99,7 @@ def train(sess, model,
           dev_csv_filename,
           test_csv_filename, 
           training_epochs=1000, 
-          alternate_epochs=10,is_restore=False):
+          alternate_epochs=10,is_restore=False,current_setting='N/A'):
   """train nvdm model."""
   train_set, train_count = utils.data_set(train_url)
   test_set, test_count = utils.data_set(test_url)
@@ -154,12 +154,12 @@ def train(sess, model,
         with open(train_csv_filename, 'a') as train_csv:
           train_writer = csv.writer(train_csv, delimiter= ',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
           train_writer.writerow([epoch+1, print_mode, i,  print_ppx, print_ppx_perdoc, print_kld])
-            
-#        print('| Epoch train: {:d} |'.format(epoch+1), 
-#               print_mode, '{:d}'.format(i),
-#               '| Corpus ppx: {:.5f}'.format(print_ppx),  # perplexity for all docs
-#               '| Per doc ppx: {:.5f}'.format(print_ppx_perdoc),  # perplexity for per doc
-#               '| KLD: {:.5}'.format(print_kld))
+        print(current_setting)
+        print('| Epoch train: {:d} |'.format(epoch+1), 
+               print_mode, '{:d}'.format(i),
+               '| Corpus ppx: {:.5f}'.format(print_ppx),  # perplexity for all docs
+               '| Per doc ppx: {:.5f}'.format(print_ppx_perdoc),  # perplexity for per doc
+               '| KLD: {:.5}'.format(print_kld))
     #-------------------------------
     # dev
     loss_sum = 0.0
@@ -182,15 +182,15 @@ def train(sess, model,
     print_ppx = np.exp(loss_sum / word_count)
     print_ppx_perdoc = np.exp(ppx_sum / doc_count)
     print_kld = kld_sum/len(dev_batches)
-    
+    print(current_setting)
     with open(dev_csv_filename, 'a') as dev_csv:
       dev_writer = csv.writer(dev_csv, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
       dev_writer.writerow([epoch+1, print_ppx, print_ppx_perdoc, print_kld])
         
-#    print('| Epoch dev: {:d} |'.format(epoch+1), 
-#           '| Perplexity: {:.9f}'.format(print_ppx),
-#           '| Per doc ppx: {:.5f}'.format(print_ppx_perdoc),
-#           '| KLD: {:.5}'.format(print_kld))        
+    print('| Epoch dev: {:d} |'.format(epoch+1), 
+           '| Perplexity: {:.9f}'.format(print_ppx),
+           '| Per doc ppx: {:.5f}'.format(print_ppx_perdoc),
+           '| KLD: {:.5}'.format(print_kld))        
     #-------------------------------
     # test
     if FLAGS.test:
@@ -214,15 +214,15 @@ def train(sess, model,
       print_ppx = np.exp(loss_sum / word_count)
       print_ppx_perdoc = np.exp(ppx_sum / doc_count)
       print_kld = kld_sum/len(test_batches)
-    
+      print(current_setting)
       with open(test_csv_filename, 'a') as test_csv:
         test_writer = csv.writer(test_csv, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
         test_writer.writerow([epoch+1, print_ppx, print_ppx_perdoc, print_kld])
         
-#      print('| Epoch test: {:d} |'.format(epoch+1), 
-#             '| Perplexity: {:.9f}'.format(print_ppx),
-#             '| Per doc ppx: {:.5f}'.format(print_ppx_perdoc),
-#             '| KLD: {:.5}'.format(print_kld))
+      print('| Epoch test: {:d} |'.format(epoch+1), 
+             '| Perplexity: {:.9f}'.format(print_ppx),
+             '| Per doc ppx: {:.5f}'.format(print_ppx_perdoc),
+             '| KLD: {:.5}'.format(print_kld))
       
     #create a check point after 50 epochs
     #if epoch % 50 == 0:
@@ -241,7 +241,7 @@ class flag:
         self.non_linearity='tanh'
 	  
 def main(argv=None):
-    print('Version 4')
+    print('Version 5')
     
     train_url = os.path.join('data/20news', 'train.feat')
     test_url = os.path.join('data/20news', 'test.feat')
@@ -255,6 +255,7 @@ def main(argv=None):
     for setting in settings[configure_setting*2:(configure_setting+1)*2]:
         # start timer
         print('-'*30)
+        current_setting = str(setting)
         print(setting)
         start_time = time.time()
 	
@@ -296,7 +297,7 @@ def main(argv=None):
            
         init = tf.global_variables_initializer()
         sess.run(init)
-        train(sess, nvdm, train_url, test_url, FLAGS.batch_size,FLAGS,train_csv_filename,dev_csv_filename,test_csv_filename,training_epochs=1)
+        train(sess, nvdm, train_url, test_url, FLAGS.batch_size,FLAGS,train_csv_filename,dev_csv_filename,test_csv_filename,current_setting=current_setting,training_epochs=1)
         sess.close()
         tf.reset_default_graph()
 	
