@@ -237,7 +237,7 @@ class flag:
         self.n_topic= n_topics
         self.n_sample=n_sample
         self.vocab_size= 2000
-        self.test=False
+        self.test=True
         self.non_linearity='tanh'
 	  
 def main(argv=None):
